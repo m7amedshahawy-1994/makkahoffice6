@@ -105,6 +105,11 @@
   .td-num { font-weight:700; color:var(--navy); font-variant-numeric: tabular-nums; }
   .td-muted { color:var(--muted); font-size:.82rem; }
   .kpi-grid-3 { grid-template-columns:repeat(3,1fr); }
+  .pager { display:none; align-items:center; justify-content:space-between; gap:8px 12px; flex-wrap:wrap; padding:10px 4px 2px; font-size:.8rem; color:var(--muted); }
+  .pager .pg-nav { display:flex; align-items:center; gap:6px; flex-wrap:wrap; }
+  .pager .pg-num { font-weight:700; color:var(--navy); padding:0 6px; white-space:nowrap; }
+  .pager button:disabled { opacity:.4; cursor:default; }
+  @media print { .pager { display:none !important; } }
   .btn.btn-xs { padding:4px 10px; font-size:.74rem; border-radius:7px; min-height:28px; line-height:1.4; gap:4px; }
   .rng-row { display:flex; align-items:center; gap:6px 8px; flex-wrap:wrap; margin-bottom:12px; }
   .rng-row label { font-size:.76rem; color:var(--muted); font-weight:600; margin:0; }
@@ -405,11 +410,11 @@
     <div class="card-body">
       <div class="print-header"><h2>👥 سجل العملاء</h2><p id="print-clients-date"></p></div>
       <div class="search-bar">
-        <input type="text" placeholder="🔍 بحث باسم العميل أو الكود..." id="client-search" oninput="renderClients()">
-        <select id="client-service-filter" onchange="renderClients()" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.9rem;">
+        <input type="text" placeholder="🔍 بحث باسم العميل أو الكود..." id="client-search" oninput="pgSearch('clients')">
+        <select id="client-service-filter" onchange="pgReset('clients')" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.9rem;">
           <option value="">كل أنواع الخدمة</option>
         </select>
-        <select id="client-address-filter" onchange="renderClients()" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.9rem;">
+        <select id="client-address-filter" onchange="pgReset('clients')" style="padding:9px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:'Tajawal',sans-serif;font-size:.9rem;">
           <option value="">كل العناوين</option>
         </select>
       </div>
@@ -441,7 +446,7 @@
     </div>
     <div class="card-body">
       <div class="search-bar">
-        <input type="text" placeholder="🔍 بحث..." id="archived-search" oninput="renderArchived()">
+        <input type="text" placeholder="🔍 بحث..." id="archived-search" oninput="pgSearch('archived')">
       </div>
       <div class="table-wrap">
         <table>
@@ -477,9 +482,9 @@
     <div class="card-body">
       <div class="print-header"><h2>💰 سجل الإيرادات</h2><p id="print-revenues-date"></p></div>
       <div class="search-bar">
-        <input type="text" placeholder="🔍 بحث بالاسم أو الكود أو طريقة الدفع أو الملاحظات..." id="payment-search" oninput="renderPayments()">
+        <input type="text" placeholder="🔍 بحث بالاسم أو الكود أو طريقة الدفع أو الملاحظات..." id="payment-search" oninput="pgSearch('pay')">
         <div class="month-filter">
-          <select id="payment-month" onchange="renderPayments()">
+          <select id="payment-month" onchange="pgReset('pay')">
             <option value="">كل الشهور</option>
             <option value="1">يناير</option><option value="2">فبراير</option>
             <option value="3">مارس</option><option value="4">أبريل</option>
@@ -488,7 +493,7 @@
             <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
             <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
           </select>
-          <select id="payment-year" onchange="renderPayments()"><option value="">كل السنوات</option></select>
+          <select id="payment-year" onchange="pgReset('pay')"><option value="">كل السنوات</option></select>
         </div>
       </div>
       <div class="table-wrap scrollable">
@@ -526,9 +531,9 @@
     <div class="card-body">
       <div class="print-header"><h2>📤 سجل المصروفات</h2><p id="print-expenses-date"></p></div>
       <div class="search-bar">
-        <input type="text" placeholder="🔍 بحث بأي بيانات..." id="expense-search" oninput="renderExpenses()">
+        <input type="text" placeholder="🔍 بحث بأي بيانات..." id="expense-search" oninput="pgSearch('exp')">
         <div class="month-filter">
-          <select id="expense-month" onchange="renderExpenses()">
+          <select id="expense-month" onchange="pgReset('exp')">
             <option value="">كل الشهور</option>
             <option value="1">يناير</option><option value="2">فبراير</option>
             <option value="3">مارس</option><option value="4">أبريل</option>
@@ -537,7 +542,7 @@
             <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
             <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
           </select>
-          <select id="expense-year" onchange="renderExpenses()"><option value="">كل السنوات</option></select>
+          <select id="expense-year" onchange="pgReset('exp')"><option value="">كل السنوات</option></select>
         </div>
       </div>
       <div class="table-wrap scrollable">
@@ -575,9 +580,9 @@
     <div class="card-body">
       <div class="print-header"><h2>📦 مصاريف المجمعة العشرية</h2><p id="print-council-date"></p></div>
       <div class="search-bar">
-        <input type="text" placeholder="🔍 بحث بأي بيانات..." id="council-search" oninput="renderCouncil()">
+        <input type="text" placeholder="🔍 بحث بأي بيانات..." id="council-search" oninput="pgSearch('cou')">
         <div class="month-filter">
-          <select id="council-month" onchange="renderCouncil()">
+          <select id="council-month" onchange="pgReset('cou')">
             <option value="">كل الشهور</option>
             <option value="1">يناير</option><option value="2">فبراير</option>
             <option value="3">مارس</option><option value="4">أبريل</option>
@@ -586,7 +591,7 @@
             <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
             <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
           </select>
-          <select id="council-year" onchange="renderCouncil()"><option value="">كل السنوات</option></select>
+          <select id="council-year" onchange="pgReset('cou')"><option value="">كل السنوات</option></select>
         </div>
       </div>
       <div class="table-wrap scrollable">
@@ -619,9 +624,9 @@
     <div class="card-body">
       <div class="print-header"><h2>🧾 النثريات</h2><p id="print-petty-date"></p></div>
       <div class="search-bar">
-        <input type="text" placeholder="🔍 بحث في البيان..." id="petty-search" oninput="renderPetty()">
+        <input type="text" placeholder="🔍 بحث في البيان..." id="petty-search" oninput="pgSearch('petty')">
         <div class="month-filter">
-          <select id="petty-month" onchange="renderPetty()">
+          <select id="petty-month" onchange="pgReset('petty')">
             <option value="">كل الشهور</option>
             <option value="1">يناير</option><option value="2">فبراير</option>
             <option value="3">مارس</option><option value="4">أبريل</option>
@@ -630,7 +635,7 @@
             <option value="9">سبتمبر</option><option value="10">أكتوبر</option>
             <option value="11">نوفمبر</option><option value="12">ديسمبر</option>
           </select>
-          <select id="petty-year" onchange="renderPetty()"><option value="">كل السنوات</option></select>
+          <select id="petty-year" onchange="pgReset('petty')"><option value="">كل السنوات</option></select>
         </div>
       </div>
       <div class="table-wrap">
@@ -682,7 +687,7 @@
     <div class="card-body">
       <div class="print-header"><h2>📋 سجل إقفالات الشهور</h2><p id="print-partners-date"></p></div>
       <div class="search-bar" style="margin-bottom:14px">
-        <input type="text" class="partners-search" placeholder="🔍 بحث في سجل الإقفالات..." id="dist-search" oninput="renderDistributions()">
+        <input type="text" class="partners-search" placeholder="🔍 بحث في سجل الإقفالات..." id="dist-search" oninput="pgSearch('dist')">
       </div>
       <div class="table-wrap">
         <table>
@@ -1116,11 +1121,13 @@ function save(skipUndo) {
   localStorage.setItem('mkb_npri',nextProfitId);
   localStorage.setItem('mkb_npeyi',nextPettyId);
   localStorage.setItem('mkb_ndisi',nextDistId);
+  _idxCache = null;
   if(typeof syncScheduleUpload==='function') syncScheduleUpload();
 }
 
 // ═══════════════ UNDO / REDO SYSTEM ═══════════════
-const UNDO_MAX = 5;
+const UNDO_MAX = 3;
+let _idxCache = null;
 let undoStack = DB.get('undoStack') || [];
 let redoStack = DB.get('redoStack') || [];
 
@@ -1159,7 +1166,7 @@ function pushUndoSnapshot() {
     nextDistId: parseInt(localStorage.getItem('mkb_ndisi')||'1'),
   };
   undoStack.push(prevStored);
-  if(undoStack.length > UNDO_MAX) undoStack.shift();
+  while(undoStack.length > UNDO_MAX) undoStack.shift();
   redoStack = []; // clear redo on new action
   DB.set('undoStack', undoStack);
   DB.set('redoStack', redoStack);
@@ -1188,7 +1195,7 @@ function performUndo() {
   if(undoStack.length === 0) { showUndoToast('لا يوجد المزيد للتراجع عنه'); return; }
   // push current state to redo
   redoStack.push(snapshotCurrentState());
-  if(redoStack.length > UNDO_MAX) redoStack.shift();
+  while(redoStack.length > UNDO_MAX) redoStack.shift();
   const prev = undoStack.pop();
   DB.set('undoStack', undoStack);
   DB.set('redoStack', redoStack);
@@ -1202,7 +1209,7 @@ function performRedo() {
   if(redoStack.length === 0) { showUndoToast('لا يوجد ما يمكن إعادته'); return; }
   // push current state to undo
   undoStack.push(snapshotCurrentState());
-  if(undoStack.length > UNDO_MAX) undoStack.shift();
+  while(undoStack.length > UNDO_MAX) undoStack.shift();
   const next = redoStack.pop();
   DB.set('undoStack', undoStack);
   DB.set('redoStack', redoStack);
@@ -1255,13 +1262,79 @@ const egp = n => Number(n||0).toLocaleString('ar-EG',{minimumFractionDigits:2,ma
 const dateStr = d => d ? new Date(d).toLocaleDateString('ar-EG') : '-';
 const MONTHS = ['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 
-function clientPaid(cid) { return payments.filter(p=>p.clientId===cid).reduce((s,p)=>s+Number(p.amount),0); }
-function clientExpenses(cid) {
-  const fromExp = expenses.filter(e=>e.clientId===cid).reduce((s,e)=>s+Number(e.amount),0);
-  const fromCou = councilExp.filter(e=>e.clientId===cid).reduce((s,e)=>s+Number(e.amount),0);
-  return fromExp + fromCou;
+// فهرس محسوب مرة واحدة: مدفوع/مصاريف كل عميل + بحث سريع عن العميل بالكود
+function dataIdx(){
+  if(_idxCache) return _idxCache;
+  const paid=Object.create(null), expO=Object.create(null), couO=Object.create(null), cmap=new Map();
+  for(const p of payments) paid[p.clientId]=(paid[p.clientId]||0)+Number(p.amount);
+  for(const e of expenses) expO[e.clientId]=(expO[e.clientId]||0)+Number(e.amount);
+  for(const e of councilExp) couO[e.clientId]=(couO[e.clientId]||0)+Number(e.amount);
+  for(const c of clients) if(!cmap.has(c.id)) cmap.set(c.id,c);
+  return (_idxCache={paid,expO,couO,cmap});
 }
+function clientPaid(cid) { return dataIdx().paid[cid]||0; }
+function clientExpenses(cid) { const x=dataIdx(); return (x.expO[cid]||0)+(x.couO[cid]||0); }
+function ymOf(d){ const s=String(d||''); if(/^\d{4}-\d{2}/.test(s)) return {y:+s.slice(0,4),m:+s.slice(5,7)}; const x=new Date(d); return {y:x.getFullYear(),m:x.getMonth()+1}; }
+function byDateDesc(a,b){ const x=String(a.date||''), y=String(b.date||''); return y>x?1:(y<x?-1:0); }
 function clientBalance(c) { return Number(c.cost) - clientPaid(c.id); }
+
+// ═══════════════ تقسيم الصفوف على صفحات ═══════════════
+const PAGER = {};
+const PAGER_BODY = { clients:'clients-tbody', archived:'archived-tbody', pay:'payments-tbody', exp:'expenses-tbody', cou:'council-tbody', petty:'petty-tbody', dist:'distributions-tbody' };
+const PAGER_RENDER = { clients:()=>renderClients(), archived:()=>renderArchived(), pay:()=>renderPayments(), exp:()=>renderExpenses(), cou:()=>renderCouncil(), petty:()=>renderPetty(), dist:()=>renderDistributions() };
+function pgState(key){ return PAGER[key] || (PAGER[key] = { page:1, all:false }); }
+function pageSize(){ return window.innerWidth <= 768 ? 20 : 30; }
+
+function paginate(key, rows){
+  const st = pgState(key), n = rows.length;
+  const size = st.all ? Math.max(n,1) : pageSize();
+  const pages = Math.max(1, Math.ceil(n/size));
+  if(st.page > pages) st.page = pages;
+  if(st.page < 1) st.page = 1;
+  const start = (st.page-1)*size, end = Math.min(start+size, n);
+  const m = document.getElementById(key+'-select-all'); if(m) m.checked = false;
+  renderPager(key, n, start, end, pages, st);
+  return { rows: rows.slice(start,end), start };
+}
+
+function renderPager(key, n, start, end, pages, st){
+  const body = document.getElementById(PAGER_BODY[key]); if(!body) return;
+  let el = document.getElementById('pager-'+key);
+  if(!el){
+    const wrap = body.closest('.table-wrap') || body.closest('table'); if(!wrap) return;
+    wrap.insertAdjacentHTML('afterend','<div class="pager" id="pager-'+key+'"></div>');
+    el = document.getElementById('pager-'+key);
+  }
+  if(n <= pageSize() && !st.all){ el.innerHTML=''; el.style.display='none'; return; }
+  el.style.display = 'flex';
+  if(st.all){
+    el.innerHTML = '<span>عرض كل الصفوف ('+n+')</span><button class="btn btn-ghost btn-xs" onclick="pgAll(\''+key+'\')">🔢 تقسيم على صفحات</button>';
+    return;
+  }
+  const page = st.page, k = "'"+key+"'";
+  el.innerHTML =
+    '<span>عرض '+(n?start+1:0)+'–'+end+' من '+n+'</span>'+
+    '<span class="pg-nav">'+
+      (pages>3?'<button class="btn btn-ghost btn-xs" onclick="pgTo('+k+',1)" '+(page<=1?'disabled':'')+'>الأولى</button>':'')+
+      '<button class="btn btn-ghost btn-xs" onclick="pgGo('+k+',-1)" '+(page<=1?'disabled':'')+'>▶ السابق</button>'+
+      '<span class="pg-num">صفحة '+page+' من '+pages+'</span>'+
+      '<button class="btn btn-ghost btn-xs" onclick="pgGo('+k+',1)" '+(page>=pages?'disabled':'')+'>التالي ◀</button>'+
+      (pages>3?'<button class="btn btn-ghost btn-xs" onclick="pgTo('+k+',1e9)" '+(page>=pages?'disabled':'')+'>الأخيرة</button>':'')+
+    '</span>'+
+    '<button class="btn btn-ghost btn-xs" onclick="pgAll('+k+')">📄 عرض الكل</button>';
+}
+function pgRerender(key){
+  PAGER_RENDER[key]();
+  const b = document.getElementById(PAGER_BODY[key]); const w = b && b.closest('.table-wrap'); if(w) w.scrollTop = 0;
+}
+function pgGo(key, d){ pgState(key).page += d; pgRerender(key); }
+function pgTo(key, pg){ pgState(key).page = pg; pgRerender(key); }
+function pgAll(key){ const st = pgState(key); st.all = !st.all; st.page = 1; pgRerender(key); }
+function pgReset(key){ pgState(key).page = 1; PAGER_RENDER[key](); }
+const _pgTimers = {};
+function pgSearch(key){ clearTimeout(_pgTimers[key]); _pgTimers[key] = setTimeout(()=>pgReset(key), 300); }
+let _lastPageSize = pageSize();
+window.addEventListener('resize', ()=>{ const s = pageSize(); if(s !== _lastPageSize){ _lastPageSize = s; renderAll(); } });
 
 // ═══════════════ NAVIGATION ═══════════════
 function toggleNav(){ const o=document.getElementById('main-nav').classList.toggle('open'); document.getElementById('nav-overlay').classList.toggle('show',o); document.body.classList.toggle('nav-open',o); }
@@ -1275,7 +1348,6 @@ function showPage(id, btn) {
   document.getElementById('page-'+id).classList.add('active');
   if(btn) btn.classList.add('active');
   if(id==='settings') loadSettingsForm();
-  if(id==='partners') { renderPartnersReport(); renderDistributions(); }
   renderAll();
 }
 
@@ -1994,14 +2066,14 @@ function getOfficeTotals(){
   const withdrawn=sum(profits);
   return {income,expense,withdrawn,balance:income-expense-withdrawn};
 }
-function renderDashboard(){
+function renderHeader(){
   const T=getOfficeTotals();
   document.getElementById('hdr-balance').textContent=egp(T.balance);
   document.getElementById('hdr-income').textContent=egp(T.income);
   document.getElementById('hdr-expense').textContent=egp(T.expense);
-  renderRangeSummary();
   document.querySelector('header h1').innerHTML=`⚖️ <span>${officeName()}</span>`;
 }
+function renderDashboard(){ renderHeader(); renderRangeSummary(); }
 // ═══════════════ أدوات التاريخ والشركاء (مشتركة) ═══════════════
 const PARTNER_COLORS=['var(--blue)','var(--green)','var(--orange)','#7b2fa8','#16a085'];
 function localISO(d){
@@ -2229,14 +2301,15 @@ function renderClients(){
     return true;
   });
   document.getElementById('clients-empty').style.display=activeClients.length===0?'block':'none';
-  document.getElementById('clients-tbody').innerHTML=filtered.map((c,idx)=>{
+  const pg=paginate('clients',filtered);
+  document.getElementById('clients-tbody').innerHTML=pg.rows.map((c,idx)=>{
     const paid=clientPaid(c.id),rem=clientBalance(c),cexp=clientExpenses(c.id);
     const profit=paid-cexp;
     const badge=rem<=0?'<span class="badge badge-green">✅ مسدد</span>':paid===0?'<span class="badge badge-red">❌ لم يسدد</span>':'<span class="badge badge-orange">⚠️ جزئي</span>';
     const expWarn=cexp>paid?'<span class="warning-badge">⚠️ مطلوب فلوس</span>':'';
     const statusBadge=c.status==='جاري'?'badge-blue':c.status==='متوقف'?'badge-orange':'badge-green';
     return `<tr>
-      <td class="td-muted c-fit" style="text-align:center;font-weight:700">${idx+1}</td>
+      <td class="td-muted c-fit" style="text-align:center;font-weight:700">${pg.start+idx+1}</td>
       <td class="c-fit"><span class="badge badge-blue">${c.id}</span></td>
       <td class="c-name"><strong>${c.name}</strong>${expWarn}</td>
       <td class="td-muted c-adr">${c.address||'—'}</td>
@@ -2269,7 +2342,8 @@ function renderArchived(){
     return true;
   });
   document.getElementById('archived-empty').style.display=archivedClients.length===0?'block':'none';
-  document.getElementById('archived-tbody').innerHTML=filtered.map(c=>{
+  const pg=paginate('archived',filtered);
+  document.getElementById('archived-tbody').innerHTML=pg.rows.map(c=>{
     const paid=clientPaid(c.id),cexp=clientExpenses(c.id);
     const netProfit=paid-cexp;
     return `<tr>
@@ -2329,21 +2403,22 @@ function bulkDelete(key) {
 
 // ═══════════════ RENDER PAYMENTS ═══════════════
 function renderPayments(){
+  const cm=dataIdx().cmap;
   const q=(document.getElementById('payment-search').value||'').toLowerCase();
   const mo=document.getElementById('payment-month').value;
   const yr=document.getElementById('payment-year').value;
   let filtered=payments.filter(p=>{
-    const c=clients.find(c=>c.id===p.clientId);
-    const searchStr=[(c?c.name:''),p.clientId,p.method||'',p.notes||'',dateStr(p.date),String(p.amount||'')].join(' ').toLowerCase();
-    if(q&&!searchStr.includes(q))return false;
-    if(mo||yr){const d=new Date(p.date);if(mo&&d.getMonth()+1!==parseInt(mo))return false;if(yr&&d.getFullYear()!==parseInt(yr))return false;}
+    const c=cm.get(p.clientId);
+    if(q){ const searchStr=[(c?c.name:''),p.clientId,p.method||'',p.notes||'',dateStr(p.date),String(p.amount||'')].join(' ').toLowerCase(); if(!searchStr.includes(q))return false; }
+    if(mo||yr){const my=ymOf(p.date);if(mo&&my.m!==parseInt(mo))return false;if(yr&&my.y!==parseInt(yr))return false;}
     return true;
-  }).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  }).sort(byDateDesc);
   document.getElementById('payments-empty').style.display=payments.length===0?'block':'none';
   const total=filtered.reduce((s,p)=>s+Number(p.amount),0);
-  document.getElementById('payments-total-row').textContent=filtered.length>0?`إجمالي المعروض: ${egp(total)}`:'';
-  document.getElementById('payments-tbody').innerHTML=filtered.map(p=>{
-    const c=clients.find(c=>c.id===p.clientId);
+  document.getElementById('payments-total-row').textContent=filtered.length>0?`إجمالي النتائج (${filtered.length}): ${egp(total)}`:'';
+  const pg=paginate('pay',filtered);
+  document.getElementById('payments-tbody').innerHTML=pg.rows.map(p=>{
+    const c=cm.get(p.clientId);
     const chk=selected.pay.has(p.id)?'checked':'';
     return `<tr class="${selected.pay.has(p.id)?'selected':''}">
       <td><input type="checkbox" class="cb-pay" data-id="${p.id}" ${chk} onchange="toggleSelect('pay','${p.id}',this)"></td>
@@ -2360,21 +2435,22 @@ function renderPayments(){
 
 // ═══════════════ RENDER EXPENSES ═══════════════
 function renderExpenses(){
+  const cm=dataIdx().cmap;
   const q=(document.getElementById('expense-search').value||'').toLowerCase();
   const mo=document.getElementById('expense-month').value;
   const yr=document.getElementById('expense-year').value;
   let filtered=expenses.filter(e=>{
-    const c=clients.find(c=>c.id===e.clientId);
-    const searchStr=[(c?c.name:''),e.clientId||'',e.desc||'',e.type||'',e.notes||'',dateStr(e.date),String(e.amount||'')].join(' ').toLowerCase();
-    if(q&&!searchStr.includes(q))return false;
-    if(mo||yr){const d=new Date(e.date);if(mo&&d.getMonth()+1!==parseInt(mo))return false;if(yr&&d.getFullYear()!==parseInt(yr))return false;}
+    const c=cm.get(e.clientId);
+    if(q){ const searchStr=[(c?c.name:''),e.clientId||'',e.desc||'',e.type||'',e.notes||'',dateStr(e.date),String(e.amount||'')].join(' ').toLowerCase(); if(!searchStr.includes(q))return false; }
+    if(mo||yr){const my=ymOf(e.date);if(mo&&my.m!==parseInt(mo))return false;if(yr&&my.y!==parseInt(yr))return false;}
     return true;
-  }).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  }).sort(byDateDesc);
   document.getElementById('expenses-empty').style.display=expenses.length===0?'block':'none';
   const total=filtered.reduce((s,e)=>s+Number(e.amount),0);
-  document.getElementById('expenses-total-row').textContent=filtered.length>0?`إجمالي المعروض: ${egp(total)}`:'';
-  document.getElementById('expenses-tbody').innerHTML=filtered.map(e=>{
-    const c=clients.find(c=>c.id===e.clientId);
+  document.getElementById('expenses-total-row').textContent=filtered.length>0?`إجمالي النتائج (${filtered.length}): ${egp(total)}`:'';
+  const pg=paginate('exp',filtered);
+  document.getElementById('expenses-tbody').innerHTML=pg.rows.map(e=>{
+    const c=cm.get(e.clientId);
     const chk=selected.exp.has(e.id)?'checked':'';
     return `<tr class="${selected.exp.has(e.id)?'selected':''}">
       <td><input type="checkbox" class="cb-exp" data-id="${e.id}" ${chk} onchange="toggleSelect('exp','${e.id}',this)"></td>
@@ -2391,21 +2467,22 @@ function renderExpenses(){
 
 // ═══════════════ RENDER COUNCIL (COMBINED) ═══════════════
 function renderCouncil(){
+  const cm=dataIdx().cmap;
   const q=(document.getElementById('council-search').value||'').toLowerCase();
   const mo=document.getElementById('council-month').value;
   const yr=document.getElementById('council-year').value;
   let filtered=councilExp.filter(e=>{
-    const c=clients.find(c=>c.id===e.clientId);
-    const searchStr=[(c?c.name:''),e.clientId||'',e.desc||'',e.type||'',e.notes||'',dateStr(e.date),String(e.amount||'')].join(' ').toLowerCase();
-    if(q&&!searchStr.includes(q))return false;
-    if(mo||yr){const d=new Date(e.date);if(mo&&d.getMonth()+1!==parseInt(mo))return false;if(yr&&d.getFullYear()!==parseInt(yr))return false;}
+    const c=cm.get(e.clientId);
+    if(q){ const searchStr=[(c?c.name:''),e.clientId||'',e.desc||'',e.type||'',e.notes||'',dateStr(e.date),String(e.amount||'')].join(' ').toLowerCase(); if(!searchStr.includes(q))return false; }
+    if(mo||yr){const my=ymOf(e.date);if(mo&&my.m!==parseInt(mo))return false;if(yr&&my.y!==parseInt(yr))return false;}
     return true;
-  }).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  }).sort(byDateDesc);
   document.getElementById('council-empty').style.display=councilExp.length===0?'block':'none';
   const total=filtered.reduce((s,e)=>s+Number(e.amount),0);
-  document.getElementById('council-total-row').textContent=filtered.length>0?`إجمالي المعروض: ${egp(total)}`:'';
-  document.getElementById('council-tbody').innerHTML=filtered.map(e=>{
-    const c=clients.find(c=>c.id===e.clientId);
+  document.getElementById('council-total-row').textContent=filtered.length>0?`إجمالي النتائج (${filtered.length}): ${egp(total)}`:'';
+  const pg=paginate('cou',filtered);
+  document.getElementById('council-tbody').innerHTML=pg.rows.map(e=>{
+    const c=cm.get(e.clientId);
     const chk=selected.cou.has(e.id)?'checked':'';
     return `<tr class="${selected.cou.has(e.id)?'selected':''}">
       <td><input type="checkbox" class="cb-cou" data-id="${e.id}" ${chk} onchange="toggleSelect('cou','${e.id}',this)"></td>
@@ -2528,13 +2605,14 @@ function renderPetty(){
   const yr=document.getElementById('petty-year').value;
   let filtered=pettyCash.filter(e=>{
     if(q&&!(e.desc||'').toLowerCase().includes(q))return false;
-    if(mo||yr){const d=new Date(e.date);if(mo&&d.getMonth()+1!==parseInt(mo))return false;if(yr&&d.getFullYear()!==parseInt(yr))return false;}
+    if(mo||yr){const my=ymOf(e.date);if(mo&&my.m!==parseInt(mo))return false;if(yr&&my.y!==parseInt(yr))return false;}
     return true;
-  }).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  }).sort(byDateDesc);
   document.getElementById('petty-empty').style.display=pettyCash.length===0?'block':'none';
   const total=filtered.reduce((s,e)=>s+Number(e.amount),0);
-  document.getElementById('petty-total-row').textContent=filtered.length>0?`إجمالي النثريات المعروضة: ${egp(total)}`:'';
-  document.getElementById('petty-tbody').innerHTML=filtered.map(e=>`
+  document.getElementById('petty-total-row').textContent=filtered.length>0?`إجمالي النثريات (${filtered.length}): ${egp(total)}`:'';
+  const pg=paginate('petty',filtered);
+  document.getElementById('petty-tbody').innerHTML=pg.rows.map(e=>`
     <tr>
       <td class="td-muted">${dateStr(e.date)}</td>
       <td>${e.desc}</td>
@@ -2561,7 +2639,8 @@ function renderDistributions(){
     return str.includes(q);
   });
   empty.style.display=distributions.length===0?'block':'none';
-  tbody.innerHTML=sorted.map(d=>{
+  const pg=paginate('dist',sorted);
+  tbody.innerHTML=pg.rows.map(d=>{
     const isLoss=d.net<0;
     const netColor=isLoss?'var(--red)':'var(--navy)';
     const perColor=isLoss?'var(--red)':'var(--green)';
@@ -2681,6 +2760,9 @@ function exportClientExcel(id) {
 
 // ═══════════════ PRINT ═══════════════
 function printPage(pageId) {
+  const _pk = ({clients:['clients'],archived:['archived'],revenues:['pay'],expenses:['exp'],council:['cou'],petty:['petty'],partners:['dist']})[pageId] || [];
+  const _prev = _pk.map(k=>pgState(k).all);
+  _pk.forEach(k=>{ pgState(k).all=true; PAGER_RENDER[k](); });
   document.body.classList.remove('printing-range');
   const dateEl=document.getElementById(`print-${pageId}-date`);
   if(dateEl) dateEl.textContent='تاريخ الطباعة: '+new Date().toLocaleDateString('ar-EG');
@@ -2688,19 +2770,29 @@ function printPage(pageId) {
   document.getElementById('page-'+pageId).classList.add('print-target');
   window.print();
   document.getElementById('page-'+pageId).classList.remove('print-target');
+  _pk.forEach((k,i)=>{ pgState(k).all=_prev[i]; PAGER_RENDER[k](); });
 }
 
+const PAGE_RENDER = {
+  dashboard: ()=>renderRangeSummary(),
+  clients:   ()=>renderClients(),
+  archived:  ()=>renderArchived(),
+  revenues:  ()=>renderPayments(),
+  expenses:  ()=>renderExpenses(),
+  council:   ()=>renderCouncil(),
+  petty:     ()=>renderPetty(),
+  partners:  ()=>{ renderPartnersReport(); renderDistributions(); renderOpenPeriod(); }
+};
+function activePageId(){
+  const a = document.querySelector('.page.active');
+  return a ? a.id.replace('page-','') : 'dashboard';
+}
+// بيرسم الهيدر + التبويب المفتوح بس (الباقي بيترسم لما تفتحه)
 function renderAll(){
-  renderDashboard();
-  renderClients();
-  renderArchived();
-  renderPayments();
-  renderExpenses();
-  renderCouncil();
-  renderPetty();
-  renderDistributions();
-  renderPartnersReport();
-  renderOpenPeriod();
+  _idxCache = null;
+  renderHeader();
+  const fn = PAGE_RENDER[activePageId()];
+  if(fn) fn();
 }
 
 // ═══════════════ EXPORT / IMPORT ═══════════════
